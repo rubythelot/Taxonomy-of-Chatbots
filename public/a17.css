@@ -1,0 +1,158 @@
+/* AREA 17 Design System
+   Colors + Typography
+   ----------------------------------
+   Type: Suisse Int'l (Light / Book / Regular / Medium / SemiBold + italics).
+   Mono fallback: JetBrains Mono (Suisse Int'l Mono not yet uploaded).
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
+
+@font-face { font-family: 'Suisse Intl'; font-style: normal; font-weight: 300;
+  src: url('fonts/SuisseIntl-Light.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: italic; font-weight: 300;
+  src: url('fonts/SuisseIntl-LightItalic.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: normal; font-weight: 400;
+  src: url('fonts/SuisseIntl-Book.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: italic; font-weight: 400;
+  src: url('fonts/SuisseIntl-BookItalic.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: normal; font-weight: 450;
+  src: url('fonts/SuisseIntl-Regular.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: italic; font-weight: 450;
+  src: url('fonts/SuisseIntl-RegularItalic.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: normal; font-weight: 500;
+  src: url('fonts/SuisseIntl-Medium.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: italic; font-weight: 500;
+  src: url('fonts/SuisseIntl-MediumItalic.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: normal; font-weight: 600;
+  src: url('fonts/SuisseIntl-SemiBold.otf') format('opentype'); font-display: swap; }
+@font-face { font-family: 'Suisse Intl'; font-style: italic; font-weight: 600;
+  src: url('fonts/SuisseIntl-SemiBoldItalic.otf') format('opentype'); font-display: swap; }
+
+:root {
+  /* —— Color: Foundations —————————————————————————————— */
+  --a17-black:        rgb(0,0,0);
+  --a17-white:        rgb(255,255,255);
+
+  /* Neutrals (text + surface) */
+  --a17-gray-900:     rgb(0,0,0);     /* text on light */
+  --a17-gray-700:     rgb(75,75,75);
+  --a17-gray-500:     rgb(117,117,117); /* muted text */
+  --a17-gray-400:     rgb(153,153,153);
+  --a17-gray-300:     rgb(179,179,179);
+  --a17-gray-200:     rgb(230,230,230); /* surface-2 light bg */
+  --a17-gray-100:     rgb(242,242,242); /* surface-1 light bg */
+
+  /* Brand accent (display color) */
+  --a17-orange:       rgb(255,94,0);    /* display backgrounds */
+  --a17-orange-soft:  rgb(255,125,50);
+  --a17-orange-tint:  rgb(255,180,180); /* Pinks for cards */
+  --a17-peach:        rgb(255,224,209);
+  --a17-peach-2:      rgb(255,201,175);
+  --a17-pink:         rgb(253,215,243);
+  --a17-pink-deep:    rgb(234,78,180);
+  --a17-magenta:      rgb(139,40,109);
+
+  /* KPI / accent palette (used on stats and api cards) */
+  --a17-mint:         rgb(203,247,237);
+  --a17-mint-2:       rgb(165,239,223);
+  --a17-teal:         rgb(22,200,171);
+  --a17-teal-deep:    rgb(8,120,97);
+
+  --a17-green:        rgb(77,226,107);
+  --a17-green-soft:   rgb(215,252,220);
+
+  --a17-blue:         rgb(42,127,255);
+  --a17-blue-soft:    rgb(207,231,255);
+  --a17-blue-deep:    rgb(18,77,147);
+
+  --a17-purple:       rgb(83,42,142);   /* dark purple section bg */
+  --a17-purple-soft:  rgb(231,216,254);
+  --a17-purple-mid:   rgb(152,81,239);
+
+  --a17-yellow:       rgb(253,243,19);
+  --a17-yellow-soft:  rgb(255,252,202);
+
+  --a17-red:          rgb(255,73,63);
+  --a17-red-soft:     rgb(255,212,213);
+
+  /* —— Semantic ————————————————————————————————————— */
+  --fg-1:             var(--a17-black);
+  --fg-2:             var(--a17-gray-500);
+  --fg-3:             var(--a17-gray-400);
+  --fg-inverse:       var(--a17-white);
+  --fg-inverse-muted: rgba(255,255,255,0.7);
+
+  --bg-1:             var(--a17-white);
+  --bg-2:             var(--a17-gray-100);
+  --bg-3:             var(--a17-gray-200);
+  --bg-inverse:       var(--a17-black);
+
+  --border:           var(--a17-black);
+  --border-hairline:  rgba(0,0,0,0.2);
+
+  /* —— Typography: Families —————————————————————————— */
+  --font-sans: 'Suisse Intl', -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Suisse Int\'l Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* —— Typography: Scale (slide canvas: 1920×1080) ——————————— */
+  /* Display / impact text */
+  --font-display:     104px;
+  --font-display-lh:  1.05;
+  --font-display-ls:  -0.02em;
+
+  --font-display-xl:    266px;     /* hero "Hello." */
+  --font-display-xl-lh: 0.9;
+  --font-display-xl-ls: -0.04em;
+
+  --font-display-md:    166px;
+  --font-display-lg:    73px;      /* big stats figure */
+  --font-display-lg-lh: 1.1;
+  --font-display-lg-ls: -0.02em;
+
+  /* Body */
+  --font-h2:          50px;        /* large quote */
+  --font-h3:          40px;        /* text body */
+  --font-h4:          30px;        /* card titles, table rows */
+  --font-body:        24px;        /* default body */
+  --font-mono-base:   20px;        /* slug + chips */
+
+  /* Default rhythm */
+  --lh-tight:         1.1;
+  --lh-snug:          1.2;
+  --lh-normal:        1.4;
+
+  /* —— Layout ——————————————————————————————————————— */
+  --slide-w:    1920px;
+  --slide-h:    1080px;
+  --slide-pad:  60px;
+  --slug-y:     60px;
+  --content-y:  220px;
+  --footer-y:   918px;
+
+  --radius-sm:  10px;
+  --radius-md:  12px;
+  --radius-pill: 49.78px;
+
+  --gap-card:   20px;
+
+  /* Motion */
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast:     150ms;
+  --t-base:     220ms;
+  --t-slow:     400ms;
+}
+
+/* —— Element-level type roles ——————————————————————— */
+.a17-display    { font-family: var(--font-sans); font-size: var(--font-display); line-height: var(--font-display-lh); letter-spacing: var(--font-display-ls); }
+.a17-display-xl { font-family: var(--font-sans); font-size: var(--font-display-xl); line-height: var(--font-display-xl-lh); letter-spacing: var(--font-display-xl-ls); font-weight: 400; }
+.a17-h2         { font-family: var(--font-sans); font-size: var(--font-h2); line-height: 1.3; letter-spacing: -0.01em; }
+.a17-h3         { font-family: var(--font-sans); font-size: var(--font-h3); line-height: var(--lh-normal); }
+.a17-h4         { font-family: var(--font-sans); font-size: var(--font-h4); line-height: var(--lh-normal); }
+.a17-body       { font-family: var(--font-sans); font-size: var(--font-body); line-height: var(--lh-normal); }
+.a17-stat       { font-family: var(--font-sans); font-size: var(--font-display-lg); line-height: var(--font-display-lg-lh); letter-spacing: var(--font-display-lg-ls); }
+.a17-mono       { font-family: var(--font-mono); font-size: var(--font-mono-base); line-height: var(--lh-normal); }
+
+/* —— Slug (the wayfinding chip on every slide) ——————————— */
+.a17-slug { font-family: var(--font-mono); font-size: 20px; line-height: 1.4; color: var(--fg-1); display: inline-flex; gap: 16px; }
+.a17-slug.is-inverse { color: var(--fg-inverse); }
+.a17-slug .sep { opacity: 1; }
