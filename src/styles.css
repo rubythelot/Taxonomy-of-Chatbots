@@ -376,6 +376,46 @@ h1 {
   align-items: center;
 }
 
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.menu-grid .wire-button {
+  justify-content: center;
+  min-height: 48px;
+  text-align: center;
+}
+
+.flow-map,
+.handoff-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  border: 1px solid var(--a17-black);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  background: var(--a17-gray-100);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.flow-map span,
+.handoff-strip span {
+  border: 1px solid var(--a17-black);
+  border-radius: var(--radius-pill);
+  padding: 6px 10px;
+  background: var(--a17-white);
+}
+
+.flow-map .active {
+  background: var(--a17-black);
+  color: var(--a17-white);
+}
+
 .citation-row {
   margin-top: 10px;
   padding-top: 10px;
@@ -450,12 +490,87 @@ h1 {
 .chart-card,
 .alert-card,
 .handoff-box,
+.attachment-card,
+.persona-card,
+.agent-card,
 .prompt-box,
 .output-box {
   border: 1px solid var(--a17-black);
   border-radius: var(--radius-sm);
   background: var(--a17-white);
   padding: 13px;
+}
+
+.carousel-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 12px;
+  overflow: hidden;
+}
+
+.product-card {
+  min-width: 0;
+  border: 1px solid var(--a17-black);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  background: var(--a17-white);
+  display: grid;
+  gap: 10px;
+}
+
+.product-card strong {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.product-media {
+  aspect-ratio: 1.45;
+  border: 1px solid var(--a17-black);
+  border-radius: 8px;
+  background: var(--a17-peach);
+}
+
+.attachment-card,
+.persona-card,
+.handoff-box {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.attachment-card {
+  background: var(--a17-purple-soft);
+}
+
+.file-tile {
+  flex: none;
+  width: 58px;
+  height: 72px;
+  border: 1px solid var(--a17-black);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--a17-white);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.attachment-card div:last-child,
+.persona-card div {
+  display: grid;
+  gap: 5px;
+}
+
+.attachment-card strong,
+.persona-card strong,
+.handoff-box strong {
+  font-weight: 500;
+}
+
+.attachment-card small,
+.persona-card small {
+  color: var(--a17-gray-500);
+  line-height: 1.35;
 }
 
 .checklist {
@@ -575,6 +690,116 @@ h1 {
   font-size: 0.68rem;
 }
 
+.voice-stage {
+  border: 1px solid var(--a17-black);
+  border-radius: var(--radius-sm);
+  background: var(--a17-mint);
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.voice-stage strong {
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.voice-stage p {
+  max-width: 34ch;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.voice-meter {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-meter span {
+  width: 12px;
+  border: 1px solid var(--a17-black);
+  border-radius: var(--radius-pill);
+  background: var(--a17-white);
+}
+
+.voice-meter span:nth-child(1),
+.voice-meter span:nth-child(5) {
+  height: 30px;
+}
+
+.voice-meter span:nth-child(2),
+.voice-meter span:nth-child(4) {
+  height: 52px;
+}
+
+.voice-meter span:nth-child(3) {
+  height: 68px;
+  background: var(--a17-black);
+}
+
+.transcript-panel {
+  border: 1px solid var(--a17-black);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  background: var(--a17-white);
+}
+
+.transcript-panel > div {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.transcript-panel span {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--a17-gray-500);
+  text-transform: uppercase;
+}
+
+.persona-card {
+  background: var(--a17-pink);
+}
+
+.mood-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mood-row .wire-chip {
+  justify-content: center;
+}
+
+.agent-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.agent-card {
+  min-height: 132px;
+  display: grid;
+  align-content: space-between;
+  gap: 18px;
+  background: var(--a17-blue-soft);
+}
+
+.agent-card span {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
 .toggle {
   display: inline-flex;
   gap: 8px;
@@ -668,68 +893,10 @@ h1 {
   }
 }
 
-.taxonomy-band {
-  background: var(--a17-white);
-}
-
 .section-heading {
   display: grid;
   gap: 26px;
   margin-bottom: 36px;
-}
-
-.lens-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-
-.lens-card {
-  min-height: 360px;
-  border: 1px solid var(--a17-black);
-  border-radius: var(--radius-md);
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-}
-
-.lens-card.mint {
-  background: var(--a17-mint);
-}
-
-.lens-card.pink {
-  background: var(--a17-pink);
-}
-
-.lens-card.peach {
-  background: var(--a17-peach);
-}
-
-.lens-number {
-  font-family: var(--font-mono);
-  font-size: clamp(3.5rem, 7vw, 6rem);
-  line-height: 1;
-  margin-bottom: auto;
-}
-
-.lens-card h3 {
-  font-size: 1rem;
-  font-weight: 500;
-  margin-top: 28px;
-}
-
-.lens-card strong {
-  display: block;
-  font-size: clamp(1.8rem, 3vw, 2.7rem);
-  line-height: 1.04;
-  font-weight: 400;
-  margin-top: 14px;
-}
-
-.lens-card p {
-  margin-top: 20px;
-  font-size: 1rem;
-  line-height: 1.45;
 }
 
 .brief-band {
@@ -788,12 +955,6 @@ h1 {
   content: "x";
 }
 
-.brief-block.evidence p {
-  color: rgba(255, 255, 255, 0.78);
-  line-height: 1.45;
-  margin-bottom: 18px;
-}
-
 .brief-block .pill {
   border-color: var(--a17-white);
   background: var(--a17-black);
@@ -824,7 +985,6 @@ h1 {
     border-top: 1px solid var(--a17-black);
   }
 
-  .lens-grid,
   .brief-grid {
     grid-template-columns: 1fr;
   }
@@ -852,7 +1012,14 @@ h1 {
 
   .control-panel,
   .detail-grid,
+  .agent-board,
+  .carousel-row,
   .split-preview {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-grid,
+  .mood-row {
     grid-template-columns: 1fr;
   }
 

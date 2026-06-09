@@ -66,6 +66,49 @@ function truncate(value, length) {
   return value && value.length > length ? `${value.slice(0, length - 1)}...` : value;
 }
 
+export function getPreviewPattern(g) {
+  const { bot, it, uc, cx } = g.sel;
+
+  if (bot.id === "multiagent") return { id: "multiagent", label: "Multi-agent workspace" };
+  if (uc.id === "companion") return { id: "companion", label: "Companion / character" };
+  if (it.id === "escalate") return { id: "handoff", label: "Human handoff" };
+  if (it.id === "monitor") return { id: "monitor", label: "Proactive monitor" };
+  if (it.id === "do" || bot.id === "agentic") return { id: "action", label: "Tool execution" };
+  if (it.id === "analyze" || uc.id === "analytics") return { id: "analytics", label: "Analytics copilot" };
+  if (it.id === "create") return { id: "creation", label: "Creation assistant" };
+  if (uc.id === "commerce") return { id: "cards", label: "Rich cards / carousel" };
+  if (uc.id === "tutoring" && it.id === "coach") return { id: "voice", label: "Voice-first coach" };
+  if (uc.id === "tutoring" && cx.id === "high") return { id: "multimodal", label: "Multimodal support" };
+  if (it.id === "coach") return { id: "coach", label: "Tutor / coach" };
+  if (it.id === "guide" && bot.id === "deterministic") return { id: "menu", label: "Button / menu flow" };
+  if (it.id === "guide") return { id: "intake", label: "Structured intake" };
+  if (bot.id === "deterministic") return { id: "menu", label: "Button / menu flow" };
+  if (cx.id === "high" && it.id === "ask") return { id: "multimodal", label: "Multimodal support" };
+  return { id: "qna", label: "Grounded Q&A" };
+}
+
+function MenuPreview({ g }) {
+  return (
+    <PreviewShell title="Button flow" input={<Input placeholder="Choose an option or type" />}>
+      <Bubble>{truncate(g.firstMessage, 96)}</Bubble>
+      <div className="menu-grid">
+        <Button solid>{g.sel.uc.label}</Button>
+        <Button>Status lookup</Button>
+        <Button>Eligibility</Button>
+        <Button>Talk to a human</Button>
+      </div>
+      <div className="flow-map">
+        <span className="active">Start</span>
+        <span>Route</span>
+        <span>Resolve</span>
+      </div>
+      <Bubble>
+        <Lines widths={["86%", "64%"]} />
+      </Bubble>
+    </PreviewShell>
+  );
+}
+
 function AskPreview({ g }) {
   return (
     <PreviewShell title="Grounded Q&A" input={<Input />}>
@@ -84,6 +127,66 @@ function AskPreview({ g }) {
         <Chip>Follow up</Chip>
         <Chip>Source</Chip>
         <Chip>Handoff</Chip>
+      </div>
+    </PreviewShell>
+  );
+}
+
+function CardsPreview({ g }) {
+  const cardTitles = g.sel.uc.id === "commerce"
+    ? ["Best match", "Budget pick", "Premium option"]
+    : ["Option A", "Option B", "Option C"];
+
+  return (
+    <PreviewShell title="Rich card concierge" input={<Input placeholder="Compare options" />}>
+      <Bubble>{truncate(g.firstMessage, 92)}</Bubble>
+      <div className="carousel-row">
+        {cardTitles.map((title, index) => (
+          <article className="product-card" key={title}>
+            <div className="product-media" />
+            <strong>{title}</strong>
+            <Lines widths={index === 0 ? ["90%", "62%"] : ["76%", "58%"]} />
+            <div className="action-buttons">
+              <Button solid={index === 0}>Select</Button>
+              <Button>Compare</Button>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="chip-row">
+        <Chip>Filter</Chip>
+        <Chip>Compare all</Chip>
+        <Chip>Checkout</Chip>
+      </div>
+    </PreviewShell>
+  );
+}
+
+function MultimodalPreview({ g }) {
+  return (
+    <PreviewShell title="Multimodal support" input={<Input placeholder="Add a file or ask a question" />}>
+      <div className="attachment-card">
+        <div className="file-tile">PDF</div>
+        <div>
+          <div className="mini-label">Context attached</div>
+          <strong>{g.sel.uc.label} reference</strong>
+          <small>Extracting text, images, and source anchors</small>
+        </div>
+      </div>
+      <Bubble side="user">{g.userPrompt}</Bubble>
+      <Bubble>
+        <Lines widths={["100%", "88%", "70%"]} />
+        <div className="citation-row">
+          <span>1</span>
+          <Line w="74px" h={7} />
+          <span>IMG</span>
+          <Line w="54px" h={7} />
+        </div>
+      </Bubble>
+      <div className="chip-row">
+        <Chip>Show evidence</Chip>
+        <Chip>Zoom source</Chip>
+        <Chip>Ask follow-up</Chip>
       </div>
     </PreviewShell>
   );
@@ -116,6 +219,39 @@ function GuidePreview({ g }) {
   );
 }
 
+function VoicePreview({ g }) {
+  return (
+    <PreviewShell title="Voice-first coach" status="listening">
+      <div className="voice-stage">
+        <div className="voice-meter">
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+        <strong>Listening</strong>
+        <p>{truncate(g.firstMessage, 96)}</p>
+      </div>
+      <div className="transcript-panel">
+        <div>
+          <span>User</span>
+          <Line w="74%" h={8} />
+        </div>
+        <div>
+          <span>Coach</span>
+          <Line w="92%" h={8} />
+        </div>
+      </div>
+      <div className="action-buttons">
+        <Button>Interrupt</Button>
+        <Button>Switch to text</Button>
+        <Button solid>Practice next</Button>
+      </div>
+    </PreviewShell>
+  );
+}
+
 function DoPreview({ g }) {
   return (
     <PreviewShell title="Action bot" input={<Input placeholder="Ask me to do something" />}>
@@ -143,6 +279,57 @@ function DoPreview({ g }) {
           <Button>Receipt</Button>
           <Button>Undo</Button>
         </div>
+      </div>
+    </PreviewShell>
+  );
+}
+
+function CompanionPreview({ g }) {
+  return (
+    <PreviewShell title="Character chat" status="in character" input={<Input placeholder="Say what happens next" />}>
+      <div className="persona-card">
+        <Avatar label="C" />
+        <div>
+          <strong>Persona memory</strong>
+          <small>Tone, relationship, scene, and boundaries</small>
+        </div>
+      </div>
+      <Bubble>{truncate(g.firstMessage, 110)}</Bubble>
+      <Bubble side="user">{g.userPrompt}</Bubble>
+      <div className="mood-row">
+        <Chip>Roleplay</Chip>
+        <Chip>Story</Chip>
+        <Chip>Voice</Chip>
+        <Chip>Memory</Chip>
+      </div>
+    </PreviewShell>
+  );
+}
+
+function MultiAgentPreview({ g }) {
+  return (
+    <PreviewShell title="Multi-agent workspace" status="orchestrating">
+      <div className="agent-board">
+        {["Planner", "Research", "Action"].map((agent, index) => (
+          <article className="agent-card" key={agent}>
+            <span>{agent}</span>
+            <Lines widths={index === 0 ? ["84%", "62%"] : ["74%", "90%"]} />
+          </article>
+        ))}
+      </div>
+      <div className="handoff-strip">
+        <span>Plan</span>
+        <Line w="70px" h={7} />
+        <span>Delegate</span>
+        <Line w="70px" h={7} />
+        <span>Synthesize</span>
+      </div>
+      <div className="action-card muted">
+        <div className="action-card-head">
+          <span>SHARED OUTPUT</span>
+          <Line w="120px" h={7} />
+        </div>
+        <Lines widths={["96%", "80%"]} />
       </div>
     </PreviewShell>
   );
@@ -280,17 +467,24 @@ function EscalatePreview({ g }) {
 }
 
 const PREVIEWS = {
-  ask: AskPreview,
-  guide: GuidePreview,
-  do: DoPreview,
-  create: CreatePreview,
-  analyze: AnalyzePreview,
+  action: DoPreview,
+  analytics: AnalyzePreview,
+  cards: CardsPreview,
   coach: CoachPreview,
+  companion: CompanionPreview,
+  creation: CreatePreview,
+  handoff: EscalatePreview,
+  intake: GuidePreview,
+  menu: MenuPreview,
   monitor: MonitorPreview,
-  escalate: EscalatePreview,
+  multimodal: MultimodalPreview,
+  multiagent: MultiAgentPreview,
+  qna: AskPreview,
+  voice: VoicePreview,
 };
 
 export default function ChatPreview({ g }) {
-  const Component = PREVIEWS[g.preview] || AskPreview;
+  const pattern = getPreviewPattern(g);
+  const Component = PREVIEWS[pattern.id] || AskPreview;
   return <Component g={g} />;
 }

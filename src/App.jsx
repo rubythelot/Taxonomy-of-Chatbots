@@ -1,40 +1,7 @@
 import React, { useMemo, useState } from "react";
-import ChatPreview from "./ChatPreview.jsx";
+import ChatPreview, { getPreviewPattern } from "./ChatPreview.jsx";
 
 const { BOT_TYPES, INTERACTIONS, USE_CASES, COMPLEXITY } = window.TAXONOMY.options;
-
-const BOT_EXPLAINERS = {
-  deterministic: "Explicit menus, rules, decision trees, and scripted responses for high-control work.",
-  intent: "Classifies intent, extracts entities, and fills slots inside a structured service flow.",
-  generative: "Produces open-ended language, drafts, summaries, and conversational help.",
-  rag: "Retrieves from trusted sources before answering, improving factual consistency and citation quality.",
-  hybrid: "Blends deterministic control with AI flexibility, which is where most production web bots land.",
-  agentic: "Plans steps, calls tools or APIs, and changes system state after confirmation.",
-  multiagent: "Coordinates specialized agents or roles for cross-domain work and complex processes.",
-};
-
-const INTERACTION_EXPLAINERS = {
-  ask: "Natural-language questions with prose answers, citations, follow-ups, and escalation.",
-  guide: "Structured intake, slot filling, validation, progress, and confirmation.",
-  do: "In-chat tool execution with action cards, permission checks, audit trails, and receipts.",
-  create: "Prompted generation with a reviewable draft, regeneration, editing, and export.",
-  analyze: "Natural language into governed queries, visualizations, tables, and written summaries.",
-  coach: "Socratic dialogue, practice mode, feedback loops, and progress memory.",
-  monitor: "Event-driven alerts, severity, next-best actions, snooze, and subscription settings.",
-  escalate: "Human handoff with transcript, variables, routing, queue state, and recovery.",
-};
-
-const ROLE_EXPLAINERS = {
-  support: "Customer self-service, account help, policies, order questions, and issue recovery.",
-  employee: "HR, IT, onboarding, internal knowledge, ticketing, and employee operations.",
-  sales: "Lead capture, qualification, routing, demo booking, and pipeline creation.",
-  commerce: "Product discovery, recommendations, cart actions, checkout support, and upsell.",
-  analytics: "Website search, intranet search, reporting, governed metrics, and decision support.",
-  tutoring: "Learning, onboarding, training, language practice, and guided skill development.",
-  companion: "Entertainment, storytelling, roleplay, social connection, and lightweight coaching.",
-};
-
-const ACCENTS = ["mint", "pink", "peach", "blue", "purple"];
 
 function SelectField({ label, value, options, onChange }) {
   const id = `select-${label.toLowerCase().replaceAll(" ", "-")}`;
@@ -105,9 +72,7 @@ export default function App() {
   const generated = useMemo(() => window.TAXONOMY.generate(selection), [selection]);
   const update = (key) => (value) => setSelection((current) => ({ ...current, [key]: value }));
   const riskTone = RiskTone({ rank: generated.riskRank });
-  const botExplainer = BOT_EXPLAINERS[selection.botType];
-  const interactionExplainer = INTERACTION_EXPLAINERS[selection.interaction];
-  const roleExplainer = ROLE_EXPLAINERS[selection.useCase];
+  const previewPattern = getPreviewPattern(generated);
 
   return (
     <main className="site-shell">
@@ -165,37 +130,15 @@ export default function App() {
           <aside className="preview-panel" aria-label="Live chatbot preview">
             <div className="panel-label">
               <span>Live preview</span>
-              <span>{generated.interactionLabel}</span>
+              <span>{previewPattern.label}</span>
             </div>
             <ChatPreview g={generated} />
           </aside>
         </div>
       </section>
 
-      <section className="taxonomy-band" aria-labelledby="taxonomy-title">
-        <div className="section-heading">
-          <div className="slug">Model / Three dimensions</div>
-          <h2 id="taxonomy-title">The selection stack.</h2>
-        </div>
-        <div className="lens-grid">
-          {[
-            ["01", "Core intelligence", generated.botLabel, botExplainer],
-            ["02", "Interaction pattern", generated.interactionLabel, interactionExplainer],
-            ["03", "Business role", generated.useCaseLabel, roleExplainer],
-          ].map(([number, label, value, text], index) => (
-            <article className={`lens-card ${ACCENTS[index]}`} key={label}>
-              <span className="lens-number">{number}</span>
-              <h3>{label}</h3>
-              <strong>{value}</strong>
-              <p>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="brief-band" aria-labelledby="brief-title">
         <div className="section-heading">
-          <div className="slug">Implementation / Risk / Evidence</div>
           <h2 id="brief-title">Product brief.</h2>
         </div>
         <div className="brief-grid">
@@ -218,11 +161,6 @@ export default function App() {
           <article className="brief-block">
             <h3>Guardrails</h3>
             <BulletList items={generated.guardrails} />
-          </article>
-          <article className="brief-block evidence">
-            <h3>Representative products</h3>
-            <p>{generated.realWorld}</p>
-            <TagList items={generated.realWorldProducts} />
           </article>
         </div>
       </section>
