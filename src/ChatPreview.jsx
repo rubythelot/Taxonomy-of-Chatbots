@@ -69,20 +69,102 @@ function truncate(value, length) {
 export function getPreviewPattern(g) {
   const { bot, it, cx } = g.sel;
 
-  if (bot.id === "multiagent") return { id: "multiagent", label: "Multi-agent workspace" };
-  if (it.id === "escalate") return { id: "handoff", label: "Human handoff" };
-  if (it.id === "monitor") return { id: "monitor", label: "Proactive monitor" };
-  if (it.id === "do" || bot.id === "agentic") return { id: "action", label: "Tool execution" };
-  if (it.id === "analyze") return { id: "analytics", label: "Analytics copilot" };
-  if (it.id === "create") return { id: "creation", label: "Creation assistant" };
-  if (it.id === "guide" && cx.id === "high") return { id: "cards", label: "Rich cards / carousel" };
-  if (it.id === "coach" && cx.id === "high") return { id: "voice", label: "Voice-first coach" };
-  if (it.id === "coach") return { id: "coach", label: "Tutor / coach" };
-  if (it.id === "guide" && bot.id === "deterministic") return { id: "menu", label: "Button / menu flow" };
-  if (it.id === "guide") return { id: "intake", label: "Structured intake" };
-  if (bot.id === "deterministic") return { id: "menu", label: "Button / menu flow" };
-  if (cx.id === "high" && it.id === "ask") return { id: "multimodal", label: "Multimodal support" };
-  return { id: "qna", label: "Grounded Q&A" };
+  if (bot.id === "multiagent") {
+    return {
+      id: "multiagent",
+      label: "Multi-agent workspace",
+      reason: "Multi-agent systems need a workspace view because the user has to see roles, delegation, and synthesized output.",
+    };
+  }
+  if (it.id === "escalate") {
+    return {
+      id: "handoff",
+      label: "Human handoff",
+      reason: "Escalation patterns are about preserving context, showing queue state, and transferring the conversation to a person.",
+    };
+  }
+  if (it.id === "monitor") {
+    return {
+      id: "monitor",
+      label: "Proactive monitor",
+      reason: "Monitor patterns start from events, so the interface centers alerts, severity, timelines, and next-best actions.",
+    };
+  }
+  if (it.id === "do" || bot.id === "agentic") {
+    return {
+      id: "action",
+      label: "Tool execution",
+      reason: "Action patterns need confirmation cards, progress states, receipts, and undo because the bot can change system state.",
+    };
+  }
+  if (it.id === "analyze") {
+    return {
+      id: "analytics",
+      label: "Analytics copilot",
+      reason: "Analyze patterns pair natural language with charts, tables, assumptions, and drill-down controls.",
+    };
+  }
+  if (it.id === "create") {
+    return {
+      id: "creation",
+      label: "Creation assistant",
+      reason: "Creation patterns need a prompt surface and a reviewable draft before the output is accepted or exported.",
+    };
+  }
+  if (it.id === "guide" && cx.id === "high") {
+    return {
+      id: "cards",
+      label: "Rich cards / carousel",
+      reason: "High-complexity guided flows often need cards or widgets so users can compare options without leaving the chat.",
+    };
+  }
+  if (it.id === "coach" && cx.id === "high") {
+    return {
+      id: "voice",
+      label: "Voice-first coach",
+      reason: "High-complexity coaching benefits from spoken practice, interruption, and transcript support.",
+    };
+  }
+  if (it.id === "coach") {
+    return {
+      id: "coach",
+      label: "Tutor / coach",
+      reason: "Coach patterns emphasize practice mode, hints, feedback, and progress rather than direct answers.",
+    };
+  }
+  if (it.id === "guide" && bot.id === "deterministic") {
+    return {
+      id: "menu",
+      label: "Button / menu flow",
+      reason: "Deterministic guided flows work best as menus because the business needs controlled paths and predictable outcomes.",
+    };
+  }
+  if (it.id === "guide") {
+    return {
+      id: "intake",
+      label: "Structured intake",
+      reason: "Guided workflows need progress, field collection, validation, and a final confirmation step.",
+    };
+  }
+  if (bot.id === "deterministic") {
+    return {
+      id: "menu",
+      label: "Button / menu flow",
+      reason: "Deterministic systems should expose clear choices instead of pretending to understand every open-ended request.",
+    };
+  }
+  if (cx.id === "high" && it.id === "ask") {
+    return {
+      id: "multimodal",
+      label: "Multimodal support",
+      reason: "High-complexity Q&A often needs files, screenshots, or documents as context, so the interface makes evidence visible.",
+    };
+  }
+  return {
+    id: "qna",
+    label: "Grounded Q&A",
+    reason: "Ask patterns work best when answers are grounded, cite sources, and offer follow-ups or handoff.",
+  };
 }
 
 function MenuPreview({ g }) {
