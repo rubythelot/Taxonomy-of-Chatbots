@@ -4,7 +4,7 @@ A React/Vite product strategy tool for mapping chatbot choices across three dime
 
 - Core intelligence
 - Interaction pattern
-- Business role
+- Complexity
 
 The generated recommendations are based on the supplied prototype taxonomy and the accompanying PDF research. The visual system uses the bundled AREA 17 Suisse font assets and design tokens.
 

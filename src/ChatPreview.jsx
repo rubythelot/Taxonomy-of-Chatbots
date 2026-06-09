@@ -67,18 +67,16 @@ function truncate(value, length) {
 }
 
 export function getPreviewPattern(g) {
-  const { bot, it, uc, cx } = g.sel;
+  const { bot, it, cx } = g.sel;
 
   if (bot.id === "multiagent") return { id: "multiagent", label: "Multi-agent workspace" };
-  if (uc.id === "companion") return { id: "companion", label: "Companion / character" };
   if (it.id === "escalate") return { id: "handoff", label: "Human handoff" };
   if (it.id === "monitor") return { id: "monitor", label: "Proactive monitor" };
   if (it.id === "do" || bot.id === "agentic") return { id: "action", label: "Tool execution" };
-  if (it.id === "analyze" || uc.id === "analytics") return { id: "analytics", label: "Analytics copilot" };
+  if (it.id === "analyze") return { id: "analytics", label: "Analytics copilot" };
   if (it.id === "create") return { id: "creation", label: "Creation assistant" };
-  if (uc.id === "commerce") return { id: "cards", label: "Rich cards / carousel" };
-  if (uc.id === "tutoring" && it.id === "coach") return { id: "voice", label: "Voice-first coach" };
-  if (uc.id === "tutoring" && cx.id === "high") return { id: "multimodal", label: "Multimodal support" };
+  if (it.id === "guide" && cx.id === "high") return { id: "cards", label: "Rich cards / carousel" };
+  if (it.id === "coach" && cx.id === "high") return { id: "voice", label: "Voice-first coach" };
   if (it.id === "coach") return { id: "coach", label: "Tutor / coach" };
   if (it.id === "guide" && bot.id === "deterministic") return { id: "menu", label: "Button / menu flow" };
   if (it.id === "guide") return { id: "intake", label: "Structured intake" };
@@ -284,28 +282,6 @@ function DoPreview({ g }) {
   );
 }
 
-function CompanionPreview({ g }) {
-  return (
-    <PreviewShell title="Character chat" status="in character" input={<Input placeholder="Say what happens next" />}>
-      <div className="persona-card">
-        <Avatar label="C" />
-        <div>
-          <strong>Persona memory</strong>
-          <small>Tone, relationship, scene, and boundaries</small>
-        </div>
-      </div>
-      <Bubble>{truncate(g.firstMessage, 110)}</Bubble>
-      <Bubble side="user">{g.userPrompt}</Bubble>
-      <div className="mood-row">
-        <Chip>Roleplay</Chip>
-        <Chip>Story</Chip>
-        <Chip>Voice</Chip>
-        <Chip>Memory</Chip>
-      </div>
-    </PreviewShell>
-  );
-}
-
 function MultiAgentPreview({ g }) {
   return (
     <PreviewShell title="Multi-agent workspace" status="orchestrating">
@@ -471,7 +447,6 @@ const PREVIEWS = {
   analytics: AnalyzePreview,
   cards: CardsPreview,
   coach: CoachPreview,
-  companion: CompanionPreview,
   creation: CreatePreview,
   handoff: EscalatePreview,
   intake: GuidePreview,

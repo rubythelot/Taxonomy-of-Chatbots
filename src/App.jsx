@@ -60,6 +60,8 @@ function RiskTone({ rank }) {
   return "low";
 }
 
+const BUSINESS_USE_CASES = USE_CASES.map((useCase) => useCase.label);
+
 export default function App() {
   const [selection, setSelection] = useState({
     botType: "hybrid",
@@ -82,8 +84,8 @@ export default function App() {
             <h1 id="page-title">Taxonomy of Chatbots.</h1>
           </div>
           <p>
-            A decision model for matching chatbot intelligence, interaction design, and business role to the
-            simplest reliable product pattern.
+            A decision model for matching chatbot intelligence and interaction design to the simplest reliable
+            product pattern.
           </p>
         </div>
       </section>
@@ -92,7 +94,6 @@ export default function App() {
         <div className="control-panel">
           <SelectField label="Core intelligence" options={BOT_TYPES} value={selection.botType} onChange={update("botType")} />
           <SelectField label="Interaction pattern" options={INTERACTIONS} value={selection.interaction} onChange={update("interaction")} />
-          <SelectField label="Business role" options={USE_CASES} value={selection.useCase} onChange={update("useCase")} />
           <SelectField label="Complexity" options={COMPLEXITY} value={selection.complexity} onChange={update("complexity")} />
         </div>
 
@@ -104,8 +105,6 @@ export default function App() {
               <span>{generated.botLabel}</span>
               <span>/</span>
               <span>{generated.interactionLabel}</span>
-              <span>/</span>
-              <span>{generated.useCaseLabel}</span>
             </div>
 
             <div className="status-row">
@@ -124,6 +123,7 @@ export default function App() {
               <Field label="Recommended UI" wide><TagList items={generated.ui} /></Field>
               <Field label="Data requirements"><TagList items={generated.data} /></Field>
               <Field label="Integrations"><TagList items={generated.integ} /></Field>
+              <Field label="Potential business use cases" wide><TagList items={BUSINESS_USE_CASES} /></Field>
             </dl>
           </section>
 

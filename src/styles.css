@@ -72,7 +72,6 @@ h1 {
 }
 
 .tool-band,
-.taxonomy-band,
 .brief-band {
   padding: 60px;
 }
@@ -83,19 +82,25 @@ h1 {
 
 .control-panel {
   display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
-  gap: 1px;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 0;
   border: 1px solid var(--a17-black);
-  background: var(--a17-black);
+  background: var(--a17-gray-200);
   margin-bottom: 20px;
 }
 
 .select-field {
   min-width: 0;
-  background: var(--a17-white);
+  background: var(--a17-gray-200);
   padding: 18px;
   display: grid;
   gap: 12px;
+  border-right: 1px solid var(--a17-black);
+  border-bottom: 1px solid var(--a17-black);
+}
+
+.select-field:nth-child(3n) {
+  border-right: 0;
 }
 
 .select-field span,
@@ -491,7 +496,6 @@ h1 {
 .alert-card,
 .handoff-box,
 .attachment-card,
-.persona-card,
 .agent-card,
 .prompt-box,
 .output-box {
@@ -531,7 +535,6 @@ h1 {
 }
 
 .attachment-card,
-.persona-card,
 .handoff-box {
   display: flex;
   gap: 12px;
@@ -555,20 +558,17 @@ h1 {
   font-size: 0.7rem;
 }
 
-.attachment-card div:last-child,
-.persona-card div {
+.attachment-card div:last-child {
   display: grid;
   gap: 5px;
 }
 
 .attachment-card strong,
-.persona-card strong,
 .handoff-box strong {
   font-weight: 500;
 }
 
-.attachment-card small,
-.persona-card small {
+.attachment-card small {
   color: var(--a17-gray-500);
   line-height: 1.35;
 }
@@ -766,20 +766,6 @@ h1 {
   text-transform: uppercase;
 }
 
-.persona-card {
-  background: var(--a17-pink);
-}
-
-.mood-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.mood-row .wire-chip {
-  justify-content: center;
-}
-
 .agent-board {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -973,7 +959,7 @@ h1 {
   }
 
   .control-panel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .result-layout {
@@ -993,7 +979,6 @@ h1 {
 @media (max-width: 760px) {
   .hero-band,
   .tool-band,
-  .taxonomy-band,
   .brief-band {
     padding: 28px;
   }
@@ -1018,8 +1003,13 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .menu-grid,
-  .mood-row {
+  .select-field,
+  .select-field:nth-child(2n),
+  .select-field:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .menu-grid {
     grid-template-columns: 1fr;
   }
 
