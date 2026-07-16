@@ -1,7 +1,23 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ChatPreview, { getPreviewPattern } from "./ChatPreview.jsx";
 
 const { BOT_TYPES, INTERACTIONS, USE_CASES, COMPLEXITY } = window.TAXONOMY.options;
+
+const USE_CASE_LABEL_TO_ID = Object.fromEntries(USE_CASES.map((u) => [u.label, u.id]));
+
+function pickValid(value, options, fallback) {
+  return options.some((option) => option.id === value) ? value : fallback;
+}
+
+function initialSelection() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    botType: pickValid(params.get("bot"), BOT_TYPES, "hybrid"),
+    interaction: pickValid(params.get("it"), INTERACTIONS, "ask"),
+    useCase: pickValid(params.get("uc"), USE_CASES, "support"),
+    complexity: pickValid(params.get("cx"), COMPLEXITY, "low"),
+  };
+}
 
 function SelectField({ label, value, options, onChange }) {
   const id = `select-${label.toLowerCase().replaceAll(" ", "-")}`;
@@ -44,13 +60,26 @@ function TagList({ items }) {
   );
 }
 
-function UseCaseRanking({ ranking }) {
+function UseCaseRanking({ ranking, activeLabel, onPick }) {
   return (
     <div className="use-case-ranking">
+      <p className="use-case-hint">Click a use case to re-render the pattern in that context.</p>
       {ranking.map((group) => (
         <div className="use-case-row" key={group.label}>
           <span>{group.label}</span>
-          <TagList items={group.items} />
+          <div className="tag-list">
+            {group.items.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={`pill pill-button ${item === activeLabel ? "inverse" : ""}`}
+                aria-pressed={item === activeLabel}
+                onClick={() => onPick(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
         </div>
       ))}
     </div>
@@ -58,18 +87,39 @@ function UseCaseRanking({ ranking }) {
 }
 
 function NotesDrawer({ g, open, onClose }) {
+  const closeRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const previouslyFocused = document.activeElement;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    closeRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      if (previouslyFocused instanceof HTMLElement) previouslyFocused.focus();
+    };
+  }, [open, onClose]);
+
   return (
     <div className={`notes-drawer-wrap ${open ? "is-open" : ""}`} aria-hidden={!open}>
-      <button className="notes-scrim" aria-label="Close deeper notes" onClick={onClose} />
-      <aside className="notes-drawer" aria-label="Deeper notes">
+      <button className="notes-scrim" aria-label="Close deeper notes" onClick={onClose} tabIndex={open ? 0 : -1} />
+      <aside className="notes-drawer" role="dialog" aria-modal="true" aria-label="Deeper notes">
         <div className="notes-drawer-head">
           <div>
             <div className="notes-kicker">Deeper notes</div>
             <h2>{g.name}</h2>
           </div>
-          <button className="notes-close" onClick={onClose}>Close x</button>
+          <button className="notes-close" ref={closeRef} onClick={onClose}>Close x</button>
         </div>
         <div className="notes-drawer-body">
+          <section className="notes-block">
+            <h3>Seen in the wild</h3>
+            <p className="notes-realworld">{g.realWorld}</p>
+            <TagList items={g.realWorldProducts} />
+          </section>
           <section className="notes-block">
             <h3>When to use this</h3>
             <ul className="notes-list">
@@ -159,6 +209,22 @@ function assessPatternFit(g) {
     };
   }
 
+  if (bot.id === "multiagent" && ["ask", "create", "coach"].includes(it.id)) {
+    return {
+      tone: "fit-warning",
+      label: "Possibly overbuilt",
+      reason: "Multiple coordinated agents rarely pay off for a single conversational task — one well-scoped agent usually covers this interaction.",
+    };
+  }
+
+  if ((bot.id === "agentic" || bot.id === "multiagent") && it.id === "escalate") {
+    return {
+      tone: "fit-warning",
+      label: "Mixed fit",
+      reason: "Escalation is mostly routing and context transfer. Agent orchestration adds little unless triage itself is genuinely complex.",
+    };
+  }
+
   if (bot.id === "multiagent" && cx.id !== "high") {
     return {
       tone: "fit-bad",
@@ -243,6 +309,82 @@ function getBusinessUseCaseRanking(g) {
     { label: "Possible", items: [...ranking.possible, ...remainder] },
     { label: "Poor fit", items: ranking.poor },
   ].filter((group) => group.items.length > 0);
+}
+
+const FIT_MARKS = { "fit-good": "+", "fit-warning": "~", "fit-bad": "x" };
+
+function MatrixSection({ selection, onPick }) {
+  const cells = useMemo(() => {
+    return BOT_TYPES.map((bot) =>
+      INTERACTIONS.map((it) => {
+        const g = window.TAXONOMY.generate({
+          botType: bot.id,
+          interaction: it.id,
+          useCase: selection.useCase,
+          complexity: selection.complexity,
+        });
+        return assessPatternFit(g);
+      })
+    );
+  }, [selection.useCase, selection.complexity]);
+
+  const cxLabel = COMPLEXITY.find((c) => c.id === selection.complexity)?.label || "";
+
+  return (
+    <section className="matrix-band" aria-labelledby="matrix-title">
+      <div className="matrix-card">
+        <div className="matrix-head">
+          <h2 id="matrix-title">The full matrix</h2>
+          <div className="matrix-legend" aria-hidden="true">
+            <span><i className="fit-good" /> Strong fit</span>
+            <span><i className="fit-warning" /> Mixed / caution</span>
+            <span><i className="fit-bad" /> Contradictory</span>
+          </div>
+        </div>
+        <p className="matrix-hint">
+          Every core intelligence crossed with every interaction pattern, assessed at {cxLabel.toLowerCase()} complexity.
+          Click a cell to load it above.
+        </p>
+        <div className="matrix-scroll">
+          <table className="matrix-table">
+            <thead>
+              <tr>
+                <th aria-label="Core intelligence" />
+                {INTERACTIONS.map((it) => (
+                  <th key={it.id} scope="col">{it.label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {BOT_TYPES.map((bot, botIndex) => (
+                <tr key={bot.id}>
+                  <th scope="row">{bot.label}</th>
+                  {INTERACTIONS.map((it, itIndex) => {
+                    const fit = cells[botIndex][itIndex];
+                    const active = selection.botType === bot.id && selection.interaction === it.id;
+                    return (
+                      <td key={it.id}>
+                        <button
+                          type="button"
+                          className={`matrix-cell ${fit.tone} ${active ? "active" : ""}`}
+                          title={`${bot.label} x ${it.label}: ${fit.label}`}
+                          aria-label={`${bot.label} with ${it.label}: ${fit.label}. Load this combination.`}
+                          aria-pressed={active}
+                          onClick={() => onPick(bot.id, it.id)}
+                        >
+                          {FIT_MARKS[fit.tone]}
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function ResearchPage() {
@@ -384,13 +526,17 @@ function ResearchPage() {
 export default function App() {
   const path = window.location.pathname;
   const [notesOpen, setNotesOpen] = useState(false);
-  const [selection, setSelection] = useState({
-    botType: "hybrid",
-    interaction: "ask",
-    useCase: "support",
-    complexity: "low",
-    channel: "web",
-  });
+  const [selection, setSelection] = useState(initialSelection);
+
+  useEffect(() => {
+    if (path === "/research") return;
+    const params = new URLSearchParams();
+    params.set("bot", selection.botType);
+    params.set("it", selection.interaction);
+    params.set("cx", selection.complexity);
+    params.set("uc", selection.useCase);
+    window.history.replaceState(null, "", `${window.location.pathname}?${params}`);
+  }, [path, selection]);
 
   const generated = useMemo(() => window.TAXONOMY.generate(selection), [selection]);
   const update = (key) => (value) => setSelection((current) => ({ ...current, [key]: value }));
@@ -398,6 +544,12 @@ export default function App() {
   const previewPattern = getPreviewPattern(generated);
   const patternFit = assessPatternFit(generated);
   const businessUseCaseRanking = getBusinessUseCaseRanking(generated);
+  const pickMatrixCell = (botType, interaction) =>
+    setSelection((current) => ({ ...current, botType, interaction }));
+  const pickUseCase = (label) => {
+    const id = USE_CASE_LABEL_TO_ID[label];
+    if (id) update("useCase")(id);
+  };
 
   if (path === "/research") {
     return <ResearchPage />;
@@ -437,13 +589,14 @@ export default function App() {
                   <span>{generated.botLabel}</span>
                   <span>/</span>
                   <span>{generated.interactionLabel}</span>
+                  <span>/</span>
+                  <span>{generated.useCaseLabel}</span>
                 </div>
               </div>
               <button className="notes-cta" onClick={() => setNotesOpen(true)}>Deeper notes</button>
             </div>
 
             <div className="status-row">
-              <Pill tone={patternFit.tone}>{patternFit.label}</Pill>
               <Pill tone="inverse">{generated.complexity} complexity</Pill>
               <Pill tone={riskTone}>{generated.risk} risk</Pill>
               {generated.underPowered ? <Pill tone="warning">Needs {generated.complexityFloor}</Pill> : null}
@@ -464,7 +617,19 @@ export default function App() {
               <Field label="Recommended UI" wide><TagList items={generated.ui} /></Field>
               <Field label="Data requirements"><TagList items={generated.data} /></Field>
               <Field label="Integrations"><TagList items={generated.integ} /></Field>
-              <Field label="Potential business use cases" wide><UseCaseRanking ranking={businessUseCaseRanking} /></Field>
+              <Field label="Seen in the wild" wide>
+                <div className="real-world">
+                  <p>{generated.realWorld}</p>
+                  <TagList items={generated.realWorldProducts} />
+                </div>
+              </Field>
+              <Field label="Potential business use cases" wide>
+                <UseCaseRanking
+                  ranking={businessUseCaseRanking}
+                  activeLabel={generated.useCaseLabel}
+                  onPick={pickUseCase}
+                />
+              </Field>
             </dl>
           </section>
 
@@ -478,6 +643,8 @@ export default function App() {
           </aside>
         </div>
       </section>
+
+      <MatrixSection selection={selection} onPick={pickMatrixCell} />
 
       <section className="ux-risk-band" aria-labelledby="ux-risks-title">
         <div className="ux-risk-card">
