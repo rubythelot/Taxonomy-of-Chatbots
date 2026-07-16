@@ -19,6 +19,11 @@ function initialSelection() {
   };
 }
 
+function initialView() {
+  const view = new URLSearchParams(window.location.search).get("view");
+  return view === "matrix" ? "matrix" : "detail";
+}
+
 function SelectField({ label, value, options, onChange }) {
   const id = `select-${label.toLowerCase().replaceAll(" ", "-")}`;
 
@@ -313,7 +318,7 @@ function getBusinessUseCaseRanking(g) {
 
 const FIT_MARKS = { "fit-good": "+", "fit-warning": "~", "fit-bad": "x" };
 
-function MatrixSection({ selection, onPick }) {
+function MatrixPanel({ selection, onPick, generated, patternFit }) {
   const cells = useMemo(() => {
     return BOT_TYPES.map((bot) =>
       INTERACTIONS.map((it) => {
@@ -331,57 +336,67 @@ function MatrixSection({ selection, onPick }) {
   const cxLabel = COMPLEXITY.find((c) => c.id === selection.complexity)?.label || "";
 
   return (
-    <section className="matrix-band" aria-labelledby="matrix-title">
-      <div className="matrix-card">
-        <div className="matrix-head">
-          <h2 id="matrix-title">The full matrix</h2>
-          <div className="matrix-legend" aria-hidden="true">
-            <span><i className="fit-good" /> Strong fit</span>
-            <span><i className="fit-warning" /> Mixed / caution</span>
-            <span><i className="fit-bad" /> Contradictory</span>
+    <section className="strategy-panel matrix-panel" aria-labelledby="matrix-title">
+      <div className="strategy-head">
+        <div>
+          <div className="result-kicker">Fit matrix</div>
+          <h2 id="matrix-title" className="matrix-title">Every pairing, one view.</h2>
+          <div className="recipe-line">
+            <span>assessed at {cxLabel.toLowerCase()} complexity</span>
           </div>
         </div>
-        <p className="matrix-hint">
-          Every core intelligence crossed with every interaction pattern, assessed at {cxLabel.toLowerCase()} complexity.
-          Click a cell to load it above.
-        </p>
-        <div className="matrix-scroll">
-          <table className="matrix-table">
-            <thead>
-              <tr>
-                <th aria-label="Core intelligence" />
-                {INTERACTIONS.map((it) => (
-                  <th key={it.id} scope="col">{it.label}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {BOT_TYPES.map((bot, botIndex) => (
-                <tr key={bot.id}>
-                  <th scope="row">{bot.label}</th>
-                  {INTERACTIONS.map((it, itIndex) => {
-                    const fit = cells[botIndex][itIndex];
-                    const active = selection.botType === bot.id && selection.interaction === it.id;
-                    return (
-                      <td key={it.id}>
-                        <button
-                          type="button"
-                          className={`matrix-cell ${fit.tone} ${active ? "active" : ""}`}
-                          title={`${bot.label} x ${it.label}: ${fit.label}`}
-                          aria-label={`${bot.label} with ${it.label}: ${fit.label}. Load this combination.`}
-                          aria-pressed={active}
-                          onClick={() => onPick(bot.id, it.id)}
-                        >
-                          {FIT_MARKS[fit.tone]}
-                        </button>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="matrix-legend" aria-hidden="true">
+          <span><i className="fit-good" /> Strong fit</span>
+          <span><i className="fit-warning" /> Mixed / caution</span>
+          <span><i className="fit-bad" /> Contradictory</span>
         </div>
+      </div>
+      <p className="matrix-hint">
+        Every core intelligence crossed with every interaction pattern. Click a cell to load it —
+        the interface pattern on the right updates with it.
+      </p>
+      <div className="matrix-scroll">
+        <table className="matrix-table">
+          <thead>
+            <tr>
+              <th aria-label="Core intelligence" />
+              {INTERACTIONS.map((it) => (
+                <th key={it.id} scope="col">{it.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {BOT_TYPES.map((bot, botIndex) => (
+              <tr key={bot.id}>
+                <th scope="row">{bot.label}</th>
+                {INTERACTIONS.map((it, itIndex) => {
+                  const fit = cells[botIndex][itIndex];
+                  const active = selection.botType === bot.id && selection.interaction === it.id;
+                  return (
+                    <td key={it.id}>
+                      <button
+                        type="button"
+                        className={`matrix-cell ${fit.tone} ${active ? "active" : ""}`}
+                        title={`${bot.label} x ${it.label}: ${fit.label}`}
+                        aria-label={`${bot.label} with ${it.label}: ${fit.label}. Load this combination.`}
+                        aria-pressed={active}
+                        onClick={() => onPick(bot.id, it.id)}
+                      >
+                        {FIT_MARKS[fit.tone]}
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className={`fit-card ${patternFit.tone}`}>
+        <strong>
+          {generated.botLabel} / {generated.interactionLabel} — {patternFit.label}
+        </strong>
+        <p>{patternFit.reason}</p>
       </div>
     </section>
   );
@@ -527,6 +542,7 @@ export default function App() {
   const path = window.location.pathname;
   const [notesOpen, setNotesOpen] = useState(false);
   const [selection, setSelection] = useState(initialSelection);
+  const [view, setView] = useState(initialView);
 
   useEffect(() => {
     if (path === "/research") return;
@@ -535,8 +551,9 @@ export default function App() {
     params.set("it", selection.interaction);
     params.set("cx", selection.complexity);
     params.set("uc", selection.useCase);
+    if (view === "matrix") params.set("view", "matrix");
     window.history.replaceState(null, "", `${window.location.pathname}?${params}`);
-  }, [path, selection]);
+  }, [path, selection, view]);
 
   const generated = useMemo(() => window.TAXONOMY.generate(selection), [selection]);
   const update = (key) => (value) => setSelection((current) => ({ ...current, [key]: value }));
@@ -579,7 +596,36 @@ export default function App() {
           <SelectField label="Complexity" options={COMPLEXITY} value={selection.complexity} onChange={update("complexity")} />
         </div>
 
+        <div className="view-tabs" role="tablist" aria-label="Result view">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === "detail"}
+            className={view === "detail" ? "active" : ""}
+            onClick={() => setView("detail")}
+          >
+            Pattern detail
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={view === "matrix"}
+            className={view === "matrix" ? "active" : ""}
+            onClick={() => setView("matrix")}
+          >
+            Fit matrix
+          </button>
+        </div>
+
         <div className="result-layout">
+          {view === "matrix" ? (
+            <MatrixPanel
+              selection={selection}
+              onPick={pickMatrixCell}
+              generated={generated}
+              patternFit={patternFit}
+            />
+          ) : (
           <section className="strategy-panel" aria-labelledby="pattern-title">
             <div className="strategy-head">
               <div>
@@ -632,6 +678,7 @@ export default function App() {
               </Field>
             </dl>
           </section>
+          )}
 
           <aside className="preview-panel" aria-label="Live chatbot preview">
             <div className="panel-label">
@@ -643,8 +690,6 @@ export default function App() {
           </aside>
         </div>
       </section>
-
-      <MatrixSection selection={selection} onPick={pickMatrixCell} />
 
       <section className="ux-risk-band" aria-labelledby="ux-risks-title">
         <div className="ux-risk-card">
