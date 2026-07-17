@@ -402,150 +402,12 @@ function MatrixPanel({ selection, onPick, generated, patternFit }) {
   );
 }
 
-function ResearchPage() {
-  const coreTypes = [
-    ["Deterministic flow", "Explicit menus, rules, decision trees, and scripted responses for tightly controlled tasks."],
-    ["Intent / NLU", "Classifies intent, extracts entities, and fills slots inside structured service paths."],
-    ["Generative assistant", "Produces open-ended language for answers, drafting, summarization, and conversational help."],
-    ["Grounded / RAG", "Retrieves from trusted sources before answering, improving factual consistency and citations."],
-    ["Hybrid", "Combines deterministic control with AI flexibility, which is where many production systems land."],
-    ["Agentic action", "Calls tools and APIs, plans steps, and changes state after explicit confirmation."],
-    ["Multi-agent", "Coordinates specialized agents or roles for complex cross-domain work."],
-  ];
-
-  const interactionPatterns = [
-    "Buttons and suggested replies",
-    "Free-text Q&A",
-    "Slot filling and structured intake",
-    "Rich cards, carousels, and widgets",
-    "In-chat actions and tool execution",
-    "Human handoff",
-    "Voice interaction",
-    "Multimodal context sharing",
-    "Proactive and event-driven interaction",
-    "Multi-party or group interaction",
-  ];
-
-  const sources = [
-    ["Google Conversational Agents", "https://cloud.google.com/products/conversational-agents/pricing"],
-    ["Microsoft AI agent design patterns", "https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/ai-agent-design-patterns"],
-    ["IBM chatbot types", "https://www.ibm.com/think/topics/chatbot-types"],
-    ["Microsoft Copilot Studio knowledge", "https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-copilot-studio"],
-    ["Google conversation design", "https://developers.google.com/assistant/conversation-design/what-is-conversation-design"],
-    ["OpenAI function calling", "https://developers.openai.com/api/docs/guides/function-calling"],
-    ["Microsoft Copilot Studio handoff", "https://learn.microsoft.com/en-us/microsoft-copilot-studio/advanced-hand-off"],
-    ["OpenAI voice agents", "https://developers.openai.com/api/docs/guides/voice-agents"],
-  ];
-
-  return (
-    <main className="research-page">
-      <section className="research-hero" aria-labelledby="research-title">
-        <a className="research-back" href="/">Back to taxonomy</a>
-        <div className="research-heading">
-          <h1 id="research-title">AI Chatbot Taxonomy for Web App Product Strategy.</h1>
-          <p>
-            The working paper behind this prototype: a layered taxonomy of chatbot intelligence,
-            interaction patterns, business roles, complexity, and design implications.
-          </p>
-        </div>
-      </section>
-      <section className="research-body" aria-label="Research summary">
-        <article className="research-article">
-          <section>
-            <div className="research-kicker">01 / Framing</div>
-            <h2>Why a single chatbot taxonomy is no longer enough.</h2>
-            <p>
-              The market no longer organizes neatly into one list of chatbot types. Major products combine
-              deterministic flows, generative answers, retrieval, tool execution, voice, multimodal context,
-              and human handoff inside the same system. A useful product taxonomy needs to describe the
-              composition of those parts rather than treating every chatbot as one fixed category.
-            </p>
-          </section>
-
-          <section>
-            <div className="research-kicker">02 / Model</div>
-            <h2>The durable model has three layers.</h2>
-            <div className="research-grid">
-              <div>
-                <h3>Core intelligence</h3>
-                <p>How the system reasons, retrieves, generates, and acts.</p>
-              </div>
-              <div>
-                <h3>Interaction pattern</h3>
-                <p>How the user provides input and how the bot responds.</p>
-              </div>
-              <div>
-                <h3>Business role</h3>
-                <p>The job the conversational surface performs inside a product or service.</p>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <div className="research-kicker">03 / Core intelligence</div>
-            <h2>The core kinds of AI chatbots.</h2>
-            <div className="research-table">
-              {coreTypes.map(([name, description]) => (
-                <div className="research-row" key={name}>
-                  <strong>{name}</strong>
-                  <p>{description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <div className="research-kicker">04 / Interactions</div>
-            <h2>The interface pattern matters as much as the model.</h2>
-            <p>
-              Teams often conflate chatbot type with interaction type. The research separates the system's
-              intelligence from the user's actual experience: buttons, free text, forms, cards, actions, handoff,
-              voice, multimodal uploads, proactive alerts, and group or multi-agent collaboration.
-            </p>
-            <div className="research-chip-list">
-              {interactionPatterns.map((pattern) => (
-                <span key={pattern}>{pattern}</span>
-              ))}
-            </div>
-          </section>
-
-          <section>
-            <div className="research-kicker">05 / Product strategy</div>
-            <h2>What this means for web apps.</h2>
-            <p>
-              The strongest question is not “Should this be a chatbot?” It is “What job should this
-              conversational surface perform, and what level of intelligence and interaction does that job
-              require?” Most strong deployments are hybrid: deterministic where control matters, grounded
-              where facts matter, tool-enabled where action matters, and human-assisted where trust or
-              sensitivity requires it.
-            </p>
-          </section>
-
-          <section>
-            <div className="research-kicker">06 / Sources</div>
-            <h2>Selected sources.</h2>
-            <ul className="research-sources">
-              {sources.map(([label, href]) => (
-                <li key={href}>
-                  <a href={href}>{label}</a>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </article>
-      </section>
-    </main>
-  );
-}
-
 export default function App() {
-  const path = window.location.pathname;
   const [notesOpen, setNotesOpen] = useState(false);
   const [selection, setSelection] = useState(initialSelection);
   const [view, setView] = useState(initialView);
 
   useEffect(() => {
-    if (path === "/research") return;
     const params = new URLSearchParams();
     params.set("bot", selection.botType);
     params.set("it", selection.interaction);
@@ -553,7 +415,7 @@ export default function App() {
     params.set("uc", selection.useCase);
     if (view === "matrix") params.set("view", "matrix");
     window.history.replaceState(null, "", `${window.location.pathname}?${params}`);
-  }, [path, selection, view]);
+  }, [selection, view]);
 
   const generated = useMemo(() => window.TAXONOMY.generate(selection), [selection]);
   const update = (key) => (value) => setSelection((current) => ({ ...current, [key]: value }));
@@ -568,10 +430,6 @@ export default function App() {
     if (id) update("useCase")(id);
   };
 
-  if (path === "/research") {
-    return <ResearchPage />;
-  }
-
   return (
     <main className="site-shell">
       <section className="hero-band" aria-labelledby="page-title">
@@ -584,7 +442,6 @@ export default function App() {
               A decision model for matching chatbot intelligence and interaction design to the simplest reliable
               product pattern.
             </p>
-            <a className="hero-link" href="/research">Read the research</a>
           </div>
         </div>
       </section>
