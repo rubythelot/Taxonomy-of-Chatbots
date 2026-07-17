@@ -1213,32 +1213,55 @@ h1 {
   margin-bottom: 16px;
 }
 
-.matrix-band {
-  background: var(--a17-gray-100);
-  padding: 0 60px 60px;
-}
-
-.matrix-card {
-  border: 1px solid var(--a17-black);
-  border-radius: var(--radius-sm);
-  background: var(--a17-white);
-  padding: 32px 36px;
-}
-
-.matrix-head {
+.view-tabs {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
-  padding-bottom: 20px;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.32);
 }
 
-.matrix-head h2 {
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  line-height: 1.1;
-  font-weight: 500;
+.view-tabs button {
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 1px solid var(--a17-black);
+  border-bottom: 0;
+  background: var(--a17-gray-200);
+  color: var(--a17-gray-700);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.view-tabs button + button {
+  border-left: 0;
+}
+
+.view-tabs button:hover {
+  color: var(--a17-black);
+}
+
+.view-tabs button.active {
+  background: var(--a17-white);
+  color: var(--a17-black);
+  position: relative;
+  margin-bottom: -1px;
+  padding-bottom: 13px;
+}
+
+.view-tabs button:focus-visible {
+  outline: 2px solid var(--a17-orange);
+  outline-offset: -2px;
+}
+
+.matrix-panel .strategy-head {
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+h2.matrix-title {
+  font-size: clamp(2rem, 3.2vw, 3.2rem);
+}
+
+.matrix-panel .fit-card {
+  max-width: none;
 }
 
 .matrix-legend {
@@ -1286,13 +1309,13 @@ h1 {
 
 .matrix-scroll {
   overflow-x: auto;
-  margin-top: 24px;
+  margin: 24px 0 26px;
 }
 
 .matrix-table {
   border-collapse: collapse;
   width: 100%;
-  min-width: 820px;
+  min-width: 720px;
 }
 
 .matrix-table th {
@@ -1320,7 +1343,7 @@ h1 {
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   border: 0;
   cursor: pointer;
   font-family: var(--font-mono);
@@ -1548,7 +1571,7 @@ h1 {
   }
 
   .result-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .preview-panel {
@@ -1571,12 +1594,9 @@ h1 {
     padding-top: 0;
   }
 
-  .matrix-band {
-    padding: 0 28px 28px;
-  }
-
-  .matrix-card {
-    padding: 22px;
+  .view-tabs button {
+    flex: 1;
+    padding: 12px 14px;
   }
 
   .research-grid,
