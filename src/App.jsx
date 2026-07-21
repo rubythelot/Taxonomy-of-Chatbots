@@ -402,12 +402,112 @@ function MatrixPanel({ selection, onPick, generated, patternFit }) {
   );
 }
 
+const GLOSSARY = [
+  {
+    group: "By how they're built",
+    kicker: "The architecture kinds",
+    terms: [
+      ["Rule-based / menu bot", "The simplest kind: follows scripted rules, buttons, and decision trees. Predictable and cheap, but breaks the moment a user goes off-script. Think phone-tree IVRs and basic website widgets."],
+      ["Intent-based (NLU) bot", "Recognises what a user means from free text (the intent) and pulls out details (entities), then routes into a structured flow. The workhorse of first-generation service bots. Seen in Google Dialogflow, Amazon Lex, Rasa."],
+      ["Generative assistant", "Powered by a large language model, it composes original answers in natural language instead of picking scripted replies. The kind most people now mean by “AI chatbot.” Seen in ChatGPT, Claude, Gemini."],
+      ["Retrieval-grounded (RAG) assistant", "A generative bot that looks up trusted content first and answers from it, with citations — so it stays accurate and current. The dominant pattern for support and docs bots. Seen in Intercom Fin, Zendesk AI."],
+      ["Hybrid bot", "Blends scripted control with generative flexibility — fixed flows where compliance matters, free generation where it helps. Where most serious production bots actually land."],
+      ["Agentic assistant", "Goes beyond talking to doing: calls tools and APIs, plans multi-step tasks, and changes real state (place an order, file a ticket) behind a confirmation. Seen in Microsoft Copilot agents, Shopify Sidekick."],
+      ["Multi-agent system", "Several specialised agents — a planner, a researcher, an executor — coordinated on one complex job, passing work between them. The emerging frontier for cross-domain tasks."],
+    ],
+  },
+  {
+    group: "By the job they do",
+    kicker: "The kinds you meet in the wild",
+    terms: [
+      ["Customer-support bot", "Answers account, order, and policy questions and resolves common issues, deflecting tickets from human agents. Seen in Zendesk AI, Intercom Fin."],
+      ["FAQ / knowledge bot", "A lightweight support bot focused on answering questions from a help centre or documentation. Often the first bot a company ships."],
+      ["Virtual assistant / copilot", "A general helper embedded in a product that answers questions and helps you get work done in-app. Seen in Microsoft Copilot, Notion AI."],
+      ["Sales / lead-gen bot", "Greets website visitors, qualifies them, and books meetings or captures leads — “conversational marketing.” Seen in Drift, HubSpot Breeze."],
+      ["Commerce / shopping assistant", "Helps shoppers find products, compare options, and check out. Seen in Shopify Sidekick and retail concierge bots."],
+      ["Employee / internal helpdesk bot", "Serves staff instead of customers — HR questions, IT tickets, internal policy. Seen in IBM AskHR, Microsoft employee self-service."],
+      ["Analytics / data copilot", "Turns natural-language questions into queries over governed data and returns charts and summaries. Seen in Looker Conversational Analytics, Tableau Agent, Power BI Copilot."],
+      ["Tutor / learning bot", "Teaches and coaches through guided practice and feedback rather than just handing over answers. Seen in Khanmigo, Duolingo."],
+      ["Companion / character bot", "Built for open-ended conversation, roleplay, or emotional support, driven by a persona rather than a task. Seen in Character.AI, Replika."],
+      ["Voice assistant", "A chatbot you talk to instead of type to, adding speech-to-text and text-to-speech. Seen in Alexa, Siri, Google Assistant, and newer voice agents."],
+      ["Proactive / notification bot", "Reaches out first based on events — alerts, reminders, next-best actions — instead of waiting to be asked."],
+    ],
+  },
+];
+
+function GlossaryPage() {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+
+  const groups = GLOSSARY.map((group) => ({
+    ...group,
+    terms: group.terms.filter(
+      ([term, def]) => !q || term.toLowerCase().includes(q) || def.toLowerCase().includes(q)
+    ),
+  })).filter((group) => group.terms.length > 0);
+
+  const totalMatches = groups.reduce((sum, group) => sum + group.terms.length, 0);
+
+  return (
+    <main className="glossary-page">
+      <section className="glossary-hero" aria-labelledby="glossary-title">
+        <a className="hero-link glossary-back" href="/">Back to taxonomy</a>
+        <div className="glossary-heading">
+          <h1 id="glossary-title">Glossary.</h1>
+          <p>
+            The different kinds of AI chatbots you meet in the wild — grouped by how they're built
+            and by the job they do — each with real-world examples.
+          </p>
+        </div>
+      </section>
+
+      <section className="glossary-body" aria-label="Glossary terms">
+        <div className="glossary-search">
+          <label htmlFor="glossary-filter">Filter terms</label>
+          <input
+            id="glossary-filter"
+            type="search"
+            placeholder="Search e.g. support, RAG, voice…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            autoComplete="off"
+          />
+          {q ? <span className="glossary-count">{totalMatches} match{totalMatches === 1 ? "" : "es"}</span> : null}
+        </div>
+
+        {groups.length === 0 ? (
+          <p className="glossary-empty">No terms match “{query}”.</p>
+        ) : (
+          groups.map((group) => (
+            <section className="glossary-group" key={group.group}>
+              <div className="glossary-group-head">
+                <h2>{group.group}</h2>
+                <span>{group.kicker}</span>
+              </div>
+              <dl className="glossary-list">
+                {group.terms.map(([term, def]) => (
+                  <div className="glossary-term" key={term}>
+                    <dt>{term}</dt>
+                    <dd>{def}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ))
+        )}
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
+  const isGlossary = window.location.pathname === "/glossary";
   const [notesOpen, setNotesOpen] = useState(false);
   const [selection, setSelection] = useState(initialSelection);
   const [view, setView] = useState(initialView);
 
   useEffect(() => {
+    if (isGlossary) return;
     const params = new URLSearchParams();
     params.set("bot", selection.botType);
     params.set("it", selection.interaction);
@@ -415,7 +515,7 @@ export default function App() {
     params.set("uc", selection.useCase);
     if (view === "matrix") params.set("view", "matrix");
     window.history.replaceState(null, "", `${window.location.pathname}?${params}`);
-  }, [selection, view]);
+  }, [isGlossary, selection, view]);
 
   const generated = useMemo(() => window.TAXONOMY.generate(selection), [selection]);
   const update = (key) => (value) => setSelection((current) => ({ ...current, [key]: value }));
@@ -430,6 +530,10 @@ export default function App() {
     if (id) update("useCase")(id);
   };
 
+  if (isGlossary) {
+    return <GlossaryPage />;
+  }
+
   return (
     <main className="site-shell">
       <section className="hero-band" aria-labelledby="page-title">
@@ -442,6 +546,7 @@ export default function App() {
               A decision model for matching chatbot intelligence and interaction design to the simplest reliable
               product pattern.
             </p>
+            <a className="hero-link" href="/glossary">Glossary</a>
           </div>
         </div>
       </section>

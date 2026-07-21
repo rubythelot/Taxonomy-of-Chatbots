@@ -78,9 +78,171 @@ h1 {
   line-height: 1.24;
 }
 
+.hero-link {
+  width: fit-content;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-pill);
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.2;
+  text-decoration: none;
+  color: var(--a17-white);
+}
+
+.hero-link:hover {
+  opacity: 0.72;
+}
+
 .tool-band,
 .ux-risk-band {
   padding: 60px;
+}
+
+.glossary-page {
+  min-height: 100vh;
+  background: var(--a17-white);
+}
+
+.glossary-hero {
+  min-height: 320px;
+  padding: 60px;
+  background: var(--a17-black);
+  color: var(--a17-white);
+  display: grid;
+  align-content: space-between;
+  gap: 56px;
+}
+
+.glossary-back {
+  color: var(--a17-white);
+}
+
+.glossary-heading {
+  display: grid;
+  gap: 24px;
+}
+
+.glossary-heading p {
+  max-width: 640px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  line-height: 1.32;
+}
+
+.glossary-body {
+  padding: 60px;
+  background: var(--a17-gray-100);
+}
+
+.glossary-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+.glossary-search label {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  color: var(--a17-gray-500);
+}
+
+.glossary-search input {
+  flex: 1;
+  min-width: 220px;
+  max-width: 460px;
+  min-height: 52px;
+  border: 1px solid var(--a17-black);
+  border-radius: var(--radius-pill);
+  background: var(--a17-white);
+  color: var(--a17-black);
+  padding: 0 20px;
+  font-size: 1rem;
+}
+
+.glossary-search input:focus {
+  outline: 2px solid var(--a17-orange);
+  outline-offset: 2px;
+}
+
+.glossary-count {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--a17-gray-500);
+}
+
+.glossary-empty {
+  font-size: 1.1rem;
+  color: var(--a17-gray-700);
+}
+
+.glossary-group {
+  border: 1px solid var(--a17-black);
+  background: var(--a17-white);
+  margin-bottom: 24px;
+}
+
+.glossary-group:last-child {
+  margin-bottom: 0;
+}
+
+.glossary-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px 32px;
+  border-bottom: 1px solid var(--a17-black);
+  background: var(--a17-gray-100);
+}
+
+.glossary-group-head h2 {
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  line-height: 1.05;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.glossary-group-head span {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  color: var(--a17-gray-500);
+}
+
+.glossary-list {
+  margin: 0;
+}
+
+.glossary-term {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  padding: 22px 32px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+.glossary-term:last-child {
+  border-bottom: 0;
+}
+
+.glossary-term dt {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.glossary-term dd {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--a17-gray-700);
 }
 
 .tool-band {
@@ -1390,12 +1552,23 @@ h2.matrix-title {
 @media (max-width: 760px) {
   .hero-band,
   .tool-band,
-  .ux-risk-band {
+  .ux-risk-band,
+  .glossary-hero,
+  .glossary-body {
     padding: 28px;
   }
 
   .ux-risk-band {
     padding-top: 0;
+  }
+
+  .glossary-term {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .glossary-group-head {
+    padding: 22px;
   }
 
   .view-tabs button {
