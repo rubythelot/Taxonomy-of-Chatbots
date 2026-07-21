@@ -402,12 +402,139 @@ function MatrixPanel({ selection, onPick, generated, patternFit }) {
   );
 }
 
+const GLOSSARY = [
+  {
+    group: "Core intelligence",
+    kicker: "How a bot reasons, retrieves, and acts",
+    terms: [
+      ["Deterministic flow", "A bot that follows explicit rules, menus, and decision trees. Every path is authored in advance, so behaviour is fully predictable — but it can't handle anything off-script."],
+      ["Intent / NLU", "Natural-language understanding that classifies what the user wants (the intent) and pulls out key details (entities), then routes into a structured path. Flexible input, controlled handling."],
+      ["Generative assistant", "Uses a large language model to produce open-ended language — answers, summaries, drafts — instead of choosing from scripted responses."],
+      ["Grounded / RAG", "Retrieval-Augmented Generation: the bot retrieves relevant passages from a trusted source before answering, so responses stay tied to real content and can cite it."],
+      ["Hybrid", "Combines deterministic control with generative flexibility — scripted where accuracy and compliance matter, generative where open-ended language helps. Where most production systems land."],
+      ["Agentic action", "A bot that can act, not just talk: it calls tools and APIs, plans multi-step tasks, and changes real system state — usually behind an explicit confirmation."],
+      ["Multi-agent", "Several specialised agents coordinated together — e.g. a planner, a researcher, and an executor — each handling part of a complex task and passing work between them."],
+    ],
+  },
+  {
+    group: "Interaction patterns",
+    kicker: "What the user actually does",
+    terms: [
+      ["Ask", "Free-text question and answer. The user types a question in natural language and gets a direct response."],
+      ["Guide", "A structured, step-by-step flow that walks the user through a task, collecting and validating each field along the way."],
+      ["Do", "The user asks the bot to perform an action and it executes via tools — after showing what it will do and getting confirmation."],
+      ["Create", "The bot generates a new artefact (copy, an image, a document) from a prompt, shown for review, regeneration, and editing before use."],
+      ["Analyze", "The user asks questions about data; the bot turns them into queries and returns charts, tables, and a written summary."],
+      ["Coach", "The bot guides practice and gives feedback rather than handing over answers — Socratic questioning, hints, and progress tracking."],
+      ["Monitor", "The bot initiates contact based on events — alerts, status changes, next-best actions — instead of waiting to be asked."],
+      ["Escalate", "Recognising when a human is needed and transferring the conversation, with full context, to a person."],
+    ],
+  },
+  {
+    group: "Key concepts",
+    kicker: "The vocabulary behind the choices",
+    terms: [
+      ["Large language model (LLM)", "The AI model behind generative bots. Trained on large text corpora to predict and produce language — the engine for answering, drafting, and reasoning."],
+      ["RAG", "Retrieval-Augmented Generation. The system first retrieves relevant documents, then feeds them to the LLM so answers are grounded in real, current content rather than the model's memory."],
+      ["Embedding", "A numeric representation of text that captures meaning, so similar concepts sit close together. Lets a bot search a knowledge base by meaning rather than exact keywords."],
+      ["Vector store", "A database of embeddings that finds the passages most relevant to a question — the retrieval half of RAG."],
+      ["Grounding", "Tying a bot's answers to verifiable source content so it doesn't invent facts. The main defence against hallucination."],
+      ["Hallucination", "When a model produces confident, plausible-sounding text that is factually wrong or unsupported. The core risk of ungrounded generation."],
+      ["Intent", "What the user is trying to accomplish with a message (e.g. “reset password”). Classifying intent is how NLU bots route requests."],
+      ["Entity", "A specific detail extracted from a message — a date, an order number, a product name — used to fill the parameters of a task."],
+      ["Slot filling", "Collecting the required pieces of information (slots) for a task, one or several at a time, until the bot has everything it needs to proceed."],
+      ["Tool / function calling", "Giving an LLM a set of functions it can invoke — look up an order, book a meeting — so it can take real actions instead of only producing text."],
+      ["Agent", "An LLM-driven system that plans and takes actions toward a goal, deciding which tools to call and in what order, rather than following a fixed script."],
+      ["Orchestration", "Coordinating multiple steps, tools, or agents into a coherent workflow — deciding what runs when and how results combine."],
+      ["System prompt", "The hidden instructions that define a bot's role, tone, rules, and boundaries before any user message arrives."],
+      ["Context window", "The amount of text (measured in tokens) a model can consider at once — the conversation, retrieved documents, and instructions all have to fit."],
+      ["Token", "The unit models read and generate — roughly a word-piece. Usage, limits, and cost are all measured in tokens."],
+      ["Guardrails", "Rules and checks that constrain what a bot can say or do — content filters, confirmation gates, refusal conditions — to keep it safe and on-task."],
+      ["Human handoff", "Transferring a conversation from bot to a human agent, ideally carrying the full transcript and context so the user doesn't repeat themselves."],
+      ["Multimodal", "Able to work with more than text — images, files, audio, screenshots — as input or output."],
+      ["Citation", "A reference to the source a grounded answer came from, so a user can verify the claim."],
+      ["Fallback", "What a bot does when it isn't confident or can't handle a request — ask a clarifying question, offer options, or escalate — instead of guessing."],
+      ["Streaming", "Sending a response token-by-token as it's generated, so the user sees it appear immediately rather than waiting for the whole answer."],
+      ["Fine-tuning", "Further training a base model on domain-specific examples to specialise its behaviour. Heavier than prompting; used when prompting alone isn't enough."],
+      ["Conversation memory", "What a bot retains across turns and sessions — earlier messages, preferences, progress — so it doesn't start from scratch each time."],
+      ["MCP (Model Context Protocol)", "An open standard for connecting AI assistants to external tools and data sources through a consistent interface."],
+    ],
+  },
+];
+
+function GlossaryPage() {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+
+  const groups = GLOSSARY.map((group) => ({
+    ...group,
+    terms: group.terms.filter(
+      ([term, def]) => !q || term.toLowerCase().includes(q) || def.toLowerCase().includes(q)
+    ),
+  })).filter((group) => group.terms.length > 0);
+
+  const totalMatches = groups.reduce((sum, group) => sum + group.terms.length, 0);
+
+  return (
+    <main className="glossary-page">
+      <section className="glossary-hero" aria-labelledby="glossary-title">
+        <a className="hero-link glossary-back" href="/">Back to taxonomy</a>
+        <div className="glossary-heading">
+          <h1 id="glossary-title">Glossary.</h1>
+          <p>
+            Plain-language definitions for the chatbot types, interaction patterns, and technical
+            terms used throughout this tool.
+          </p>
+        </div>
+      </section>
+
+      <section className="glossary-body" aria-label="Glossary terms">
+        <div className="glossary-search">
+          <label htmlFor="glossary-filter">Filter terms</label>
+          <input
+            id="glossary-filter"
+            type="search"
+            placeholder="Search e.g. RAG, intent, handoff…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            autoComplete="off"
+          />
+          {q ? <span className="glossary-count">{totalMatches} match{totalMatches === 1 ? "" : "es"}</span> : null}
+        </div>
+
+        {groups.length === 0 ? (
+          <p className="glossary-empty">No terms match “{query}”.</p>
+        ) : (
+          groups.map((group) => (
+            <section className="glossary-group" key={group.group}>
+              <div className="glossary-group-head">
+                <h2>{group.group}</h2>
+                <span>{group.kicker}</span>
+              </div>
+              <dl className="glossary-list">
+                {group.terms.map(([term, def]) => (
+                  <div className="glossary-term" key={term}>
+                    <dt>{term}</dt>
+                    <dd>{def}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ))
+        )}
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
+  const isGlossary = window.location.pathname === "/glossary";
   const [notesOpen, setNotesOpen] = useState(false);
   const [selection, setSelection] = useState(initialSelection);
   const [view, setView] = useState(initialView);
 
   useEffect(() => {
+    if (isGlossary) return;
     const params = new URLSearchParams();
     params.set("bot", selection.botType);
     params.set("it", selection.interaction);
@@ -415,7 +542,7 @@ export default function App() {
     params.set("uc", selection.useCase);
     if (view === "matrix") params.set("view", "matrix");
     window.history.replaceState(null, "", `${window.location.pathname}?${params}`);
-  }, [selection, view]);
+  }, [isGlossary, selection, view]);
 
   const generated = useMemo(() => window.TAXONOMY.generate(selection), [selection]);
   const update = (key) => (value) => setSelection((current) => ({ ...current, [key]: value }));
@@ -430,6 +557,10 @@ export default function App() {
     if (id) update("useCase")(id);
   };
 
+  if (isGlossary) {
+    return <GlossaryPage />;
+  }
+
   return (
     <main className="site-shell">
       <section className="hero-band" aria-labelledby="page-title">
@@ -442,6 +573,7 @@ export default function App() {
               A decision model for matching chatbot intelligence and interaction design to the simplest reliable
               product pattern.
             </p>
+            <a className="hero-link" href="/glossary">Glossary</a>
           </div>
         </div>
       </section>
